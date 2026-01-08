@@ -12,7 +12,8 @@ A zero-cost, offline, schema-aware Text-to-SQL engine using local LLMs.
 
 ## Installation
 ```bash
-pip install -e .
+pip install intelligent-text2sql
+
 
 
 from intelligent_text2sql import Text2SQL
