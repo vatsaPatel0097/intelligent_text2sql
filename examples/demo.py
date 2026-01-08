@@ -1,4 +1,6 @@
-from intelligent_text2sql.utils.ollama_client import ask_ollama
+from intelligent_text2sql.core.engine import Text2SQL
 
-response = ask_ollama("Write a SQL query to get top 5 products by sales")
-print(response)
+engine = Text2SQL("sqlite:///data/sales.db")
+
+output = engine.run("test")
+print(output)
