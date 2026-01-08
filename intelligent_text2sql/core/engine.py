@@ -13,6 +13,8 @@ from intelligent_text2sql.utils.sql_explainer import explain_sql
 from intelligent_text2sql.utils.ambiguity import detect_ambiguity, build_clarification
 from intelligent_text2sql.utils.sql_disambiguator import resolve_group_by
 from intelligent_text2sql.utils.sql_table_validator import validate_tables
+from intelligent_text2sql.utils.fastpath import fast_sql
+from intelligent_text2sql.utils.sql_column_validator import validate_columns
 
 
 class Text2SQL:
@@ -44,6 +46,19 @@ class Text2SQL:
         return [self.schema_chunks[i] for i in top_indices]
 
     def run(self, query: str):
+        # FAST PATH
+        fast = fast_sql(query)
+        if fast:
+            sql = clean_sql(fast)
+            df = execute_sql_safe(self.db_path, sql)
+            return {
+                "sql": sql,
+                "data": df,
+                "confidence": 0.95,
+                "explanation": "Query handled using fast rule-based path."
+            }
+
+
         # Ambiguity check
         ambiguities = detect_ambiguity(query)
         if ambiguities:
@@ -56,8 +71,22 @@ class Text2SQL:
         relevant_schema = self._get_relevant_schema(query)
         prompt = build_sql_prompt(query, relevant_schema)
 
-        raw_sql = ask_ollama(prompt)
+        raw_sql = ask_ollama(prompt,model="phi") #Later i have to change it to phi or low storage model
         sql = clean_sql(raw_sql)
+
+        invalid_columns = validate_columns(sql, self.schema)
+
+        if invalid_columns:
+            return {
+                "sql": sql,
+                "error": f"Invalid column(s) referenced: {invalid_columns}",
+                "confidence": 0.25,
+                "explanation": (
+                    "The generated SQL references columns not present in the database schema. "
+                    "This is a known limitation of language models."
+                )
+            }
+
 
         sql = resolve_group_by(sql, self.schema)
 

@@ -1,5 +1,6 @@
 def build_sql_prompt(user_query: str, schema_chunks: list) -> str:
-    schema_text = "\n".join(schema_chunks)
+    schema_text = "\n".join(schema_chunks[:1])
+
 
     prompt = f"""
 You are a SQL expert.
