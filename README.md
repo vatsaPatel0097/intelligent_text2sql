@@ -60,15 +60,21 @@ Get running in seconds with a SQLite database.
 ```python
 from intelligent_text2sql import Text2SQL
 
-# Initialize the engine with your database URI
-engine = Text2SQL("sqlite:///data/sales.db")
+engine = Text2SQL(
+    "sqlite:///data/sales.db",
+    llm_backend="ollama"
+)
 
-# Run a natural language query
-result = engine.run("Show total sales per customer")
+result = engine.run("Show total sales by customer")
 
-# Access the results
-print(f"SQL: {result['sql']}")
-print(f"Data:\n{result['data']}")
+if result.get("needs_clarification"):
+    print(result["message"])
+elif result.get("error"):
+    print(result["error"])
+else:
+    print(result["sql"])
+    print(result["data"])
+
 ```
 
 ### Example Output
