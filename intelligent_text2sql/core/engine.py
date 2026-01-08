@@ -11,6 +11,8 @@ from intelligent_text2sql.utils.sql_executor import execute_sql_safe
 from intelligent_text2sql.utils.confidence import compute_confidence
 from intelligent_text2sql.utils.sql_explainer import explain_sql
 from intelligent_text2sql.utils.ambiguity import detect_ambiguity, build_clarification
+from intelligent_text2sql.utils.sql_disambiguator import resolve_group_by
+from intelligent_text2sql.utils.sql_table_validator import validate_tables
 
 
 class Text2SQL:
@@ -57,10 +59,24 @@ class Text2SQL:
         raw_sql = ask_ollama(prompt)
         sql = clean_sql(raw_sql)
 
+        sql = resolve_group_by(sql, self.schema)
+
         if not is_safe_sql(sql):
             raise ValueError("Unsafe SQL detected")
 
+        invalid_tables = validate_tables(sql, self.schema)
+
+        if invalid_tables:
+            return {
+                "sql": sql,
+                "error": f"Unknown table(s) referenced: {invalid_tables}",
+                "confidence": 0.3,
+                "explanation": "The generated SQL references tables not present in the database schema."
+            }
+
         df = execute_sql_safe(self.db_path, sql)
+
+
 
         return {
             "sql": sql,
