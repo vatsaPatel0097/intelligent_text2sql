@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import os   
 
 from intelligent_text2sql import Text2SQL
 
@@ -9,11 +10,14 @@ st.title("🧠 Intelligent Text-to-SQL")
 st.caption("Offline • Zero-cost • Schema-aware")
 
 # DB path (local)
-DB_PATH = "sqlite:///data/sales.db"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = f"sqlite:///{os.path.join(BASE_DIR, 'data', 'sales.db')}"
+
 
 @st.cache_resource
 def load_engine():
-    return Text2SQL(DB_PATH)
+    return Text2SQL(DB_PATH, llm_backend="ollama")
+
 
 engine = load_engine()
 

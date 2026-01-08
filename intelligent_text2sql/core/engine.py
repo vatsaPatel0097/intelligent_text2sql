@@ -18,8 +18,14 @@ from intelligent_text2sql.utils.sql_column_validator import validate_columns
 
 
 class Text2SQL:
-    def __init__(self, db_url: str):
+    def __init__(self, db_url: str, llm_backend: str | None = None):
+        """
+        llm_backend:
+        - None        → no LLM (safe / fast-path only)
+        - "ollama"    → local Ollama LLM
+        """
         self.db_path = db_url.replace("sqlite:///", "")
+        self.llm_backend = llm_backend
 
         # 1. Load schema
         self.schema = get_sqlite_schema(self.db_path)
@@ -71,7 +77,18 @@ class Text2SQL:
         relevant_schema = self._get_relevant_schema(query)
         prompt = build_sql_prompt(query, relevant_schema)
 
-        raw_sql = ask_ollama(prompt,model="phi") #Later i have to change it to phi or low storage model
+        if self.llm_backend != "ollama":
+            return {
+                "error": "LLM backend not configured",
+                "confidence": 0.0,
+                "explanation": (
+                    "No LLM backend is configured. "
+                    "Install and configure Ollama or use a supported LLM backend."
+                )
+            }
+
+        raw_sql = ask_ollama(prompt, model="phi")
+ #Later i have to change it to phi or low storage model
         sql = clean_sql(raw_sql)
 
         invalid_columns = validate_columns(sql, self.schema)
