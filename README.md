@@ -90,16 +90,16 @@ The engine follows a multi-step pipeline to ensure accuracy and safety:
 
 ```mermaid
 graph TD
-    A[User Query] --> B{Ambiguity Check}
-    B -- Ambiguous --> C[Request Clarification]
-    B -- Clear --> D[Schema Extraction]
-    D --> E[Table Selection via Embeddings]
-    E --> F[SQL Generation]
-    F --> G[Validation (Table/Column Check)]
-    G --> H{Safety Check}
-    H -- Unsafe --> I[Block Execution]
-    H -- Safe --> J[Execute SQL]
-    J --> K[Return Result]
+    A["User Query"] --> B{"Ambiguity Check"}
+    B -- Ambiguous --> C["Request Clarification"]
+    B -- Clear --> D["Schema Extraction"]
+    D --> E["Table Selection via Embeddings"]
+    E --> F["SQL Generation"]
+    F --> G["Validation (Table/Column Check)"]
+    G --> H{"Safety Check"}
+    H -- Unsafe --> I["Block Execution"]
+    H -- Safe --> J["Execute SQL"]
+    J --> K["Return Result"]
 ```
 
 1.  **Schema Extraction**: Analyzes the database structure.
@@ -170,6 +170,6 @@ Distributed under the **MIT License**. See `LICENSE` for more information.
 
 <div align="center">
 
-**Created by [Vatsal Patel](hhttps://github.com/vatsaPatel0097)**
+**Created by [Vatsal Patel](https://github.com/vatsaPatel0097)**
 
 </div>
