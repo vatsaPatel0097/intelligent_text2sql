@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "intelligent-text2sql"
+version = "0.1.0"
+description = "Zero-cost, offline, schema-aware Text-to-SQL engine"
+authors = [{ name = "Vatsal Patel" }]
+readme = "README.md"
+requires-python = ">=3.9"
+
+dependencies = [
+    "pandas",
+    "sentence-transformers",
+    "scikit-learn"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+
