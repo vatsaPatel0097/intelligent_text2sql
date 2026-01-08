@@ -2,6 +2,8 @@ from intelligent_text2sql.utils.db_utils import get_sqlite_schema
 from intelligent_text2sql.utils.embedding_utils import most_relevant
 from intelligent_text2sql.utils.prompt_builder import build_sql_prompt
 from intelligent_text2sql.utils.ollama_client import ask_ollama
+from intelligent_text2sql.utils.sql_validator import is_safe_sql
+from intelligent_text2sql.utils.sql_executor import execute_sql_safe
 
 class Text2SQL:
     def __init__(self, db_url: str):
@@ -22,10 +24,14 @@ class Text2SQL:
         )
 
         prompt = build_sql_prompt(query, relevant_schema)
-
         sql = ask_ollama(prompt)
+
+        if not is_safe_sql(sql):
+            raise ValueError("Unsafe SQL detected")
+
+        df = execute_sql_safe(self.db_path, sql)
 
         return {
             "sql": sql,
-            "used_schema": relevant_schema
+            "data": df
         }

@@ -5,5 +5,7 @@ engine = Text2SQL("sqlite:///data/sales.db")
 query = "Show top customers by total purchase"
 result = engine.run(query)
 
-print("Generated SQL:")
+print("SQL:")
 print(result["sql"])
+print("\nResult:")
+print(result["data"])
